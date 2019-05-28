@@ -53,7 +53,7 @@ def detect_fruit(image):
     # image = tf.keras.utils.normalize(image, axis=1)
     image = np.asarray([[image]])
     prediction = MODEL.predict(image)
-    return fruit_labels[np.argmax(prediction)]
+    return (fruit_labels[np.argmax(prediction)], prediction)
 
 def load_labels():
     train_filelist = glob.glob(TRAIN_DATASET)
