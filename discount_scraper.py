@@ -11,20 +11,20 @@ def get_info(fruit):
     start1 = time.time()
     
     base_url = 'https://www.nemlig.com/'
-    # browser = webdriver.Firefox()
+    browser = webdriver.Firefox()
 
-    options = Options()
-    options.add_argument('--headless')
-    browser = webdriver.Firefox(options=options)
+    # options = Options()
+    # options.add_argument('--headless')
+    # browser = webdriver.Firefox(options=options)
 
     browser.get(base_url)
-    # browser.implicitly_wait(3)
 
     search_field = browser.find_element_by_tag_name('input')
     search_field.send_keys(fruit)
     search_field.submit()
 
     select = Select(browser.find_element_by_id('filter-sorting'))
+    browser.implicitly_wait(1)
     # select by visible text
     select.select_by_visible_text('Billigst')
 
@@ -33,7 +33,7 @@ def get_info(fruit):
 
     #Fetch the HTML and close the browser
     page_source = browser.page_source
-    browser.close()
+    browser.quit()
     end1 = time.time()
     print(end1 - start1)
 
@@ -61,8 +61,8 @@ def get_info(fruit):
             products.append((float(f"{price}.{decimals}"), name, link))
             # print(f"{price}.{decimals} - {name} - {link}")
     
-    # for x in products:
-    #     print(x)
+    for x in products:
+        print(x)
     end2 = time.time()
     end = time.time()
     print(end2 - start2)
@@ -70,4 +70,4 @@ def get_info(fruit):
     return products
 
 if __name__ == "__main__":
-    get_info('Avocado')
+    get_info('Banan')
