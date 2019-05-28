@@ -21,6 +21,7 @@ if __name__ == "__main__":
         collect_data.start(args.collect_data[0], args.collect_data[1])
     elif(args.image):
         image = cv2.imread(args.image[0])
-        fruitDetect.detect_fruit(image)
+        prediction = fruitDetect.detect_fruit(image)
+        print(prediction)
     else:
         moveDetect.start()
