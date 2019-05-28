@@ -240,9 +240,7 @@ def start():
 
         handle_inputs()
 
-        # if we have auto enabled
-        if auto:
-            if found_confirmed and not data_fetched:
+        if found_confirmed and not data_fetched:
                 # webscraping for prices
                 prices = get_prices(type_found)
 
@@ -251,7 +249,8 @@ def start():
 
                 data_fetched = True
 
-
+        # if we have auto enabled
+        if auto:
             # Check if delta should be updated
             if(frame_indicator % DELTA_FREQUENCY == 0):
                 # calculating the delta from the keyframe
