@@ -12,6 +12,10 @@ from fruitDetect import detect_fruit
 
 from PIL import ImageFont, ImageDraw, Image
 
+# Constants
+DELTA_FREQUENCY = 30
+KEYFRAME_DELTA_SENSITIVITY = 0.82 
+MOVEMENT_SENSITIVITY = 1.91
 
 frame = None
 type_found = None
@@ -25,8 +29,9 @@ f_width = None
 f_height = None
 gray = []
 auto = None
-key_frame = []
 
+key_frame = []
+image = []
 
 def take_picture():
     # making sure to use the global image variable 
@@ -96,17 +101,20 @@ def handle_inputs():
             
 
 def display_content():
-    global frame, f_width, f_height, type_found, prices, found_confirmed, label_height, label_width, time_found, selected
+    global frame, f_width, f_height, type_found, prices, found_confirmed, label_height, label_width, time_found, selected, image, auto
     
     # copying frame
     dframe = copy.copy(frame)
 
     font = cv2.FONT_HERSHEY_COMPLEX
 
+    auto_text = "auto on" if auto else "auto off"
+    cv2.putText(dframe, auto_text, (5,f_height -5), font, 0.7, (255,0,0), 1, cv2.LINE_AA)
+
     if not found_confirmed: 
         if time_found:
             # Calculate time remaining for countdown
-            counter = int((time_found + 5) - time.time())
+            counter = int((time_found + 3) - time.time())
             
             # If it goes under zero, accept the type found
             if counter < 0:
@@ -119,14 +127,19 @@ def display_content():
     
     if type_found:
         # Generate type text depending on confirmation
+        text_color = (255,255,255)
         display_found = type_found
         indent = 80
         if not found_confirmed:
             display_found = f"Is this: {type_found}?"
             indent = 180
+        elif len(image) == 0:
+            text_color = (215,215,215)
+            
+            
 
         # Displaying type text 
-        cv2.putText(dframe, display_found, (int(f_width/2) - indent, (f_height-30)), font, 1.5, (255,255,255), 5, cv2.LINE_AA)
+        cv2.putText(dframe, display_found, (int(f_width/2) - indent, (f_height-30)), font, 1.5, text_color, 5, cv2.LINE_AA)
 
     # Value for relative height position 
     height_pos = 0
@@ -155,22 +168,14 @@ def display_content():
     return dframe
 
 def start():
-    global frame, type_found, time_found, found_confirmed, prices, selected,label_height, label_width, f_width, f_height, key_frame, image, gray, auto
-
-    # Constants
-    DELTA_FREQUENCY = 30
-    KEYFRAME_DELTA_SENSITIVITY = 0.82 
-    MOVEMENT_SENSITIVITY = 1.91
+    global frame, type_found, time_found, found_confirmed, prices, selected,label_height, label_width, f_width, f_height, key_frame, image, gray, auto, DELTA_FREQUENCY, MOVEMENT_SENSITIVITY, KEYFRAME_DELTA_SENSITIVITY
 
     cap = cv2.VideoCapture(0)
 
     # auto-take photos
     auto = True
 
-    # frames
-    key_frame = []
-    last_frame = []
-    image = []
+    
     last_delta = 0
     frame_indicator = 0
     delta = 0
@@ -219,15 +224,12 @@ def start():
                 # calculating the delta from the keyframe
                 (new_delta, diff) = compare_ssim(key_frame, gray, full=True)
                 delta = new_delta
-                print("new delta:",delta)
                 frame_indicator = 0
             if delta <= KEYFRAME_DELTA_SENSITIVITY:
                 # if there is a previous frame and if there is not already a image
-                print("len img:", len(image))
                 if len(last_frame) > 0 and len(image) == 0:
                     # calculating delta value from last to current frame
                     (cur_delta, diff) = compare_ssim(gray, last_frame, full=True)
-                    print(cur_delta + last_delta)   
                     # if the last 2 deltas go over a threshold
                     if (cur_delta + last_delta) > MOVEMENT_SENSITIVITY:
                         # print("PICTURE!")

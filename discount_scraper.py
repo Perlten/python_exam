@@ -3,10 +3,13 @@ from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
-
 from selenium.webdriver.firefox.options import Options
+from py_translator import Translator
 
 def get_info(name):
+    name = Translator().translate(text=name, dest='dk').text
+    print(name)
+
     base_url = 'https://www.nemlig.com/'
     browser = webdriver.Firefox()
     # browser = webdriver.PhantomJS()
