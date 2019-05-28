@@ -18,14 +18,15 @@ def graph_each_fruit_with_certainty_percent(df, label):
     plt.figure()
     count = 1
     fruit_graph = {}
+    label = label.capitalize()
     # Iter over banana dataset and create dict with bananas aplt.show()nd % guessed
     for i, row in df.iterrows():
         fruit_graph[count] = row['certainty_level %']
         count += 1
     # Display graph
     plt.title(f'{label} and their certainity %')
-    plt.xlabel(f'Each number is {label[:-1]} index guessed')
-    plt.ylabel("% Certain of guess")
+    plt.xlabel(f'Each number is index of {label[:-1]} guessed')
+    plt.ylabel(f"% Certainty of {label[:-1]}")
     plt.plot(fruit_graph.keys(), fruit_graph.values())
     plt.xticks(np.arange(1,len(df)+1, 1))
     plt.yticks(np.arange(0, 101, 10))
@@ -95,6 +96,7 @@ def graph_file():
     #  all fruits are in this case shown together
     #dynamic solution, looks at allf ruits and plots afterwards
     data = set(df['fruit'])
+    longest = 0
     plt.figure()
     for x in data:
         element = df[fruit_mask(df, 'fruit', x)]
@@ -105,11 +107,14 @@ def graph_file():
             fruit_graph[count] = row['certainty_level %']
             count += 1
         # Display graph
-        plt.plot(fruit_graph.keys(), fruit_graph.values(), label=x)
+        if(len(fruit_graph) > longest):
+            longest = len(fruit_graph)
+        plt.plot(fruit_graph.keys(), fruit_graph.values(), label=x, marker='o')
 
     plt.legend()
     plt.title(f'Fruits and their certainity %')
     plt.yticks(np.arange(0, 101, 10))
+    plt.xticks(np.arange(1, longest+1, 1))
 
     #4) calls function on each fruit name and displays it as a graph
     #dynamic solution for each fruit in the dataset
