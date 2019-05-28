@@ -6,23 +6,29 @@ import time
 image = []
 fruit_type = None
 counter = None
+take_image = False
 
 
 def handle_inputs():
-
+    global take_image
     if keyboard.is_pressed("q"):
         cap.release()
         cv2.destroyAllWindows()
         sys.exit(-1)
 
     if keyboard.is_pressed(" "):
-        take_picture()
+        print(take_image)
+        if take_image: 
+            take_image = False
+        else: 
+            take_image = True
+        # take_picture()
         time.sleep(0.1)
 
 def take_picture():
     global counter
     name = f"{fruit_type}_{counter}"
-    cv2.imwrite(f"dataset9/test1/{name}.jpg", image)
+    cv2.imwrite(f"temp/{name}.jpg", image)
     print(name)
     counter += 1
 
@@ -42,6 +48,9 @@ def start(fruit_type_arg, counter_arg):
         image = frame
         cv2.imshow('frame',image)
         handle_inputs()
+        if take_image: 
+            take_picture()
+            time.sleep(0.1)
         cv2.waitKey(1)
     
     cap.release()

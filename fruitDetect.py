@@ -7,9 +7,9 @@ from tensorflow.keras.models import Model
 import glob
 from tensorflow.keras.models import load_model
 
-IMAGE_SIZE = 68
-TRAIN_DATASET = "dataset10/train/*"
-TEST_DATASET = "dataset10/test1/*"
+IMAGE_SIZE = 50
+TRAIN_DATASET = "dataset9/train/*"
+TEST_DATASET = "dataset9/test1/*"
 
 
 def proccess_image(image):
@@ -29,7 +29,6 @@ def make_labels(label_list):
     for x in label_list:
         y_train.append(get_index_from_type(x))
     y_train = np.asarray(y_train)
-    print(y_train)
     return y_train
 
 def get_index_from_type(fruit_type:str):
@@ -46,12 +45,12 @@ def import_images(filelist):
 
 def detect_fruit(image):
     global fruit_labels
-
+    fruit_labels = load_labels()
     MODEL = load_model("fruitDetectModel.h5")
+    image = resize(image, IMAGE_SIZE)
     image = proccess_image(image)
 
-    image = resize(image, IMAGE_SIZE)
-    image = tf.keras.utils.normalize(image, axis=1)
+    # image = tf.keras.utils.normalize(image, axis=1)
     image = np.asarray([[image]])
     prediction = MODEL.predict(image)
     return (fruit_labels[np.argmax(prediction)], prediction)
@@ -68,7 +67,6 @@ if __name__ == "__main__":
 
     train_filelist = glob.glob(TRAIN_DATASET)
     train_label_list = [name.split("_")[0].split("/")[-1] for name in train_filelist]
-    fruit_labels = np.unique(train_label_list)
     x_train = import_images(train_filelist)
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
@@ -91,13 +89,11 @@ if __name__ == "__main__":
         loss="sparse_categorical_crossentropy",
         metrics=["accuracy"]
     )
-    model.fit(x_train, y_train, epochs=15)
+    model.fit(x_train, y_train, epochs=10)
     val_loss, val_acc = model.evaluate(x_test, y_test)
     predictions = model.predict([x_test])
 
-    # for x in range(len(test_label_list)):
-    #     pred_label = np.argmax(predictions[x])
-    #     print("The label was:", pred_label, "and was", test_label_list[x])
+    for x in range(len(test_label_list)):
+        pred_label = np.argmax(predictions[x])
+        print("Thought it was:", fruit_labels[pred_label], "and was", test_label_list[x])
     model.save("fruitDetectModel.h5")
-else:
-    fruit_labels = load_labels()
