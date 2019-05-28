@@ -8,6 +8,7 @@ import sys
 import copy
 import webbrowser
 from fruitDetect import detect_fruit
+from fruitSaver import save_fruit
 # from multiprocessing import Process
 
 from PIL import ImageFont, ImageDraw, Image
@@ -23,6 +24,10 @@ label_height = None
 label_width = None
 f_width = None
 f_height = None
+gray = []
+auto = None
+key_frame = []
+fruit_percents_guessed = None
 
 
 def take_picture():
@@ -35,15 +40,21 @@ def take_picture():
     return image
 
 def predict_picture():
-    global type_found, time_found, found_confirmed
+    global type_found, time_found, found_confirmed, image, fruit_percents_guessed
 
-    picture_taken = take_picture()
-    type_found = detect_fruit(image)
+    image = take_picture()
+    type_found = detect_fruit(image)[0]
+    fruit_percents_guessed = detect_fruit(image)[1]
     time_found = time.time()
     found_confirmed = False
 
 def handle_inputs():
-    global auto, key_frame, found_confirmed, time_found, type_found, selected, prices
+    global auto, key_frame, found_confirmed, time_found, type_found, selected, prices, gray
+
+    if keyboard.is_pressed('a'):
+        auto = not auto
+        print(f"auto: {auto}")
+        time.sleep(0.4)
 
     if keyboard.is_pressed('r'):
         key_frame = gray
@@ -104,6 +115,11 @@ def display_content():
             if counter < 0:
                 found_confirmed = True
                 time_found = None
+                print('im happy')
+                #Saving the fruit, giving the fruit label and the max % found
+                save_fruit(type_found, int(np.amax(fruit_percents_guessed*100)))
+               
+                
             # If not, display the counter
             else:
                 cv2.putText(dframe, str(counter), (int(f_width / 2) - 40,100), font, 4, (255,255,255), 5, cv2.LINE_AA)
@@ -147,7 +163,7 @@ def display_content():
     return dframe
 
 def start():
-    global frame, type_found, time_found, found_confirmed, prices, selected,label_height, label_width, f_width, f_height
+    global frame, type_found, time_found, found_confirmed, prices, selected,label_height, label_width, f_width, f_height, key_frame, image, gray, auto
 
     # Constants
     DELTA_FREQUENCY = 30
@@ -168,10 +184,10 @@ def start():
     delta = 0
 
     # displays
-    type_found = "apple"
-    time_found = time.time()
+    type_found = ""
+    time_found = None
     found_confirmed = False
-    prices = [(3,"Kwickly", "https://kwickly.dk/"), (4, "Netto"), (6, "Irma", "https://irma.dk/"), (2,"Fakta", "https://fakta.dk/")]
+    prices = [(3,"Banan", "https://kwickly.dk/"), (4, "Banan i pose"), (6, "Bananos", "https://irma.dk/"), (2,"Banani", "https://fakta.dk/")]
 
     # selection
     selected = 0
@@ -211,15 +227,18 @@ def start():
                 # calculating the delta from the keyframe
                 (new_delta, diff) = compare_ssim(key_frame, gray, full=True)
                 delta = new_delta
+                #print("new delta:",delta)
                 frame_indicator = 0
             if delta <= KEYFRAME_DELTA_SENSITIVITY:
                 # if there is a previous frame and if there is not already a image
+                #print("len img:", len(image))
                 if len(last_frame) > 0 and len(image) == 0:
                     # calculating delta value from last to current frame
                     (cur_delta, diff) = compare_ssim(gray, last_frame, full=True)
-                    print(cur_delta + last_delta)   
+                    #print(cur_delta + last_delta)   
                     # if the last 2 deltas go over a threshold
                     if (cur_delta + last_delta) > MOVEMENT_SENSITIVITY:
+                        # print("PICTURE!")
                         predict_picture()
                     # saving the last delta
                     last_delta = cur_delta
