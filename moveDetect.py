@@ -8,6 +8,7 @@ import sys
 import copy
 import webbrowser
 from fruitDetect import detect_fruit
+from fruitSaver import save_fruit
 # from multiprocessing import Process
 
 from PIL import ImageFont, ImageDraw, Image
@@ -29,6 +30,7 @@ f_width = None
 f_height = None
 gray = []
 auto = None
+fruit_percents_guessed = None
 
 key_frame = []
 image = []
@@ -43,10 +45,11 @@ def take_picture():
     return image
 
 def predict_picture():
-    global type_found, time_found, found_confirmed, image
+    global type_found, time_found, found_confirmed, image, fruit_percents_guessed
 
     image = take_picture()
-    type_found = detect_fruit(image)
+    type_found = detect_fruit(image)[0]
+    fruit_percents_guessed = detect_fruit(image)[1]
     time_found = time.time()
     found_confirmed = False
 
@@ -120,6 +123,11 @@ def display_content():
             if counter < 0:
                 found_confirmed = True
                 time_found = None
+                print('im happy')
+                #Saving the fruit, giving the fruit label and the max % found
+                save_fruit(type_found, int(np.amax(fruit_percents_guessed*100)))
+               
+                
             # If not, display the counter
             else:
                 cv2.putText(dframe, str(counter), (int(f_width / 2) - 40,100), font, 4, (255,255,255), 5, cv2.LINE_AA)

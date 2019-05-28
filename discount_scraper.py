@@ -6,57 +6,62 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.firefox.options import Options
 from py_translator import Translator
 
-def get_info(name):
-    name = Translator().translate(text=name, dest='dk').text
-    print(name)
+def get_info(type_found):
+    type_found = Translator().translate(text=type_found, dest='dk').text
+    print(type_found)
 
     base_url = 'https://www.nemlig.com/'
-    browser = webdriver.Firefox()
-    # browser = webdriver.PhantomJS()
+    # browser = webdriver.Firefox()
 
-    # options = Options()
-    # options.add_argument('--headless')
-    # browser = webdriver.Firefox(options=options)
+    options = Options()
+    options.add_argument('--headless')
+    browser = webdriver.Firefox(options=options)
 
     browser.get(base_url)
-    browser.implicitly_wait(3)
-
-    search_field = browser.find_element_by_tag_name('input')
-    search_field.send_keys(name)
-    search_field.submit()
-
-    # sleep(2)
     # browser.implicitly_wait(3)
 
-    select = Select(browser.find_element_by_id('filter-sorting'))
+    search_field = browser.find_element_by_tag_name('input')
+    search_field.send_keys(type_found)
+    search_field.submit()
 
+    select = Select(browser.find_element_by_id('filter-sorting'))
     # select by visible text
     select.select_by_visible_text('Billigst')
-    print(browser.current_url)
 
-    browser.find_element_by_xpath("//a[@class='productlist-item__link']").click()
+    # browser.find_element_by_xpath("//a[@class='productlist-item__link']").click()
+    # sleep(1)
 
-    sleep(1)
-
+    #Fetch the HTML and close the browser
     page_source = browser.page_source
-
-    soup = bs4.BeautifulSoup(page_source, 'html.parser')
-    price_cells = soup.find_all('div', {'class':'pricecontainer__base-price'})
-    name_cells = soup.find_all('div', {'class':'product-detail__info'})
-    
-    # print(name_cells)
-    product = name_cells[0].select("h1")[0].getText()
-    price = price_cells[0].select("span")[0].getText()
-    decimals = price_cells[0].select("sup")[0].getText()
-
-    # print(f"Price: {price},{decimals}")
-    print(f"Product: {product} Price: {price},{decimals}")
-    print(browser.current_url)
-
     browser.close()
+    
+    soup = bs4.BeautifulSoup(page_source, 'html.parser')
+
+    #Find all tags containing the wanted values. Tag name is equal to the value to the right.
+    price_cells = soup.find_all('div', {'class':'pricecontainer__base-price'})
+    name_cells = soup.find_all('div', {'data-automation':'nmItemOnPg'})
+    product_links = soup.find_all('a', {'class':'productlist-item__link'})
+    
+    products = []
+    counter = 0
+    #Loop through the name cells to match the first 4 to the wanted fruit
+    for i, product in enumerate(name_cells):
+        name = product.getText()
+        if name.startswith(type_found) and counter < 4:
+            counter += 1
+            #Take the values out of the given tags
+            price = price_cells[i].select("span")[0].getText()
+            decimals = price_cells[i].select("sup")[0].getText()
+            link = base_url + product_links[i]['href']
+            #Convert the price to one float, as it comes in two values.
+            #Add it all to a list as tuples
+            products.append((float(f"{price}.{decimals}"), name, link))
+            # print(f"{price}.{decimals} - {name} - {link}")
+    
+    # for x in products:
+    #     print(x)
+    
+    return products
 
 if __name__ == "__main__":
-    # for x in range(3):
-    #     get_info('Banan')
-    get_info('Banan')
-    get_info('Æble')
+    get_info('Avocado')
