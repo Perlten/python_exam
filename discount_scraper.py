@@ -3,37 +3,63 @@ from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
-from selenium.webdriver.firefox.options import Options
-from py_translator import Translator
+from selenium.webdriver.firefox.options import Options as FOptions
+from selenium.webdriver.chrome.options import Options as COptions
+import platform
 
-def get_info(type_found):
-    type_found = Translator().translate(text=type_found, dest='dk').text
+# from py_translator import Translator
+
+def trans(type_found): 
+    if type_found == "banana":
+        return "Banan"
+    elif type_found == "apple":
+        return "Æble"
+    elif type_found == "orange":
+        return "Appelsin"
+    elif type_found == "avocado":
+        return "Avocado"
+    elif type_found == "coffee":
+        return "Kaffe"
+
+def get_prices(type_found):
+    type_found = trans(type_found)
     print(type_found)
 
     base_url = 'https://www.nemlig.com/'
-    # browser = webdriver.Firefox()
 
-    options = Options()
-    options.add_argument('--headless')
-    browser = webdriver.Firefox(options=options)
+    if platform.system() == "Linux":
+        options = FOptions()
+        options.add_argument('--headless')
+        browser = webdriver.Firefox(options=options)
+    else:
+        options = COptions()
+        # options.add_argument('--headless')
+        # options.add_argument("--disable-extensions")
+        # options.add_argument("--disable-gpu")
+        # options.add_argument("--no-sandbox")
+        browser = webdriver.Chrome(options=options)
+        
+
 
     browser.get(base_url)
-    # browser.implicitly_wait(3)
 
     search_field = browser.find_element_by_tag_name('input')
     search_field.send_keys(type_found)
     search_field.submit()
 
+    sleep(0.5)
     select = Select(browser.find_element_by_id('filter-sorting'))
     # select by visible text
     select.select_by_visible_text('Billigst')
+    sleep(1)
+
 
     # browser.find_element_by_xpath("//a[@class='productlist-item__link']").click()
     # sleep(1)
 
     #Fetch the HTML and close the browser
     page_source = browser.page_source
-    browser.close()
+    browser.quit()
     
     soup = bs4.BeautifulSoup(page_source, 'html.parser')
 
@@ -55,13 +81,14 @@ def get_info(type_found):
             link = base_url + product_links[i]['href']
             #Convert the price to one float, as it comes in two values.
             #Add it all to a list as tuples
-            products.append((float(f"{price}.{decimals}"), name, link))
+            price_decimals = float(f'{price}.{decimals}')
+            products.append((price_decimals, name, link))
             # print(f"{price}.{decimals} - {name} - {link}")
     
-    # for x in products:
-    #     print(x)
+    for x in products:
+        print(x)
     
     return products
 
 if __name__ == "__main__":
-    get_info('Avocado')
+    get_prices('avocado')

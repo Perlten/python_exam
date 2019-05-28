@@ -9,6 +9,7 @@ import copy
 import webbrowser
 from fruitDetect import detect_fruit
 from fruitSaver import save_fruit
+from discount_scraper import get_prices
 # from multiprocessing import Process
 
 from PIL import ImageFont, ImageDraw, Image
@@ -31,17 +32,20 @@ f_height = None
 gray = []
 auto = None
 fruit_percents_guessed = None
+data_fetched = False
 
 key_frame = []
 image = []
 
 def take_picture():
     # making sure to use the global image variable 
-    global image
+    global image, data_fetched
 
     # converting color output
     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     print("picture taken!")
+
+    data_fetched = False
     return image
 
 def predict_picture():
@@ -123,9 +127,9 @@ def display_content():
             if counter < 0:
                 found_confirmed = True
                 time_found = None
-                print('im happy')
-                #Saving the fruit, giving the fruit label and the max % found
-                save_fruit(type_found, int(np.amax(fruit_percents_guessed*100)))
+
+                #TODO move to other logic
+                
                
                 
             # If not, display the counter
@@ -176,7 +180,7 @@ def display_content():
     return dframe
 
 def start():
-    global frame, type_found, time_found, found_confirmed, prices, selected,label_height, label_width, f_width, f_height, key_frame, image, gray, auto, DELTA_FREQUENCY, MOVEMENT_SENSITIVITY, KEYFRAME_DELTA_SENSITIVITY
+    global frame, type_found, time_found, found_confirmed, prices, selected,label_height, label_width, f_width, f_height, key_frame, image, gray, auto, DELTA_FREQUENCY, MOVEMENT_SENSITIVITY, KEYFRAME_DELTA_SENSITIVITY, data_fetched
 
     cap = cv2.VideoCapture(0)
 
@@ -192,7 +196,9 @@ def start():
     type_found = ""
     time_found = None
     found_confirmed = False
-    prices = [(3,"Banan", "https://kwickly.dk/"), (4, "Banan i pose"), (6, "Bananos", "https://irma.dk/"), (2,"Banani", "https://fakta.dk/")]
+    prices = []
+    
+    
 
     # selection
     selected = 0
@@ -227,12 +233,23 @@ def start():
 
         # if we have auto enabled
         if auto:
+            if found_confirmed and not data_fetched:
+                # webscraping for prices
+                prices = get_prices(type_found)
+
+                #Saving the fruit, giving the fruit label and the max % found
+                save_fruit(type_found, int(np.amax(fruit_percents_guessed*100)))
+
+                data_fetched = True
+
+
             # Check if delta should be updated
             if(frame_indicator % DELTA_FREQUENCY == 0):
                 # calculating the delta from the keyframe
                 (new_delta, diff) = compare_ssim(key_frame, gray, full=True)
                 delta = new_delta
                 frame_indicator = 0
+
             if delta <= KEYFRAME_DELTA_SENSITIVITY:
                 # if there is a previous frame and if there is not already a image
                 if len(last_frame) > 0 and len(image) == 0:
@@ -240,7 +257,6 @@ def start():
                     (cur_delta, diff) = compare_ssim(gray, last_frame, full=True)
                     # if the last 2 deltas go over a threshold
                     if (cur_delta + last_delta) > MOVEMENT_SENSITIVITY:
-                        # print("PICTURE!")
                         predict_picture()
                     # saving the last delta
                     last_delta = cur_delta
