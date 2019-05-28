@@ -81,8 +81,10 @@ if __name__ == "__main__":
 
     model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(220, activation=tf.nn.relu))
-    model.add(tf.keras.layers.Dense(180, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Dense(1000, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Dense(700, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Dense(400, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Dense(200, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(100, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(60, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(len(fruit_labels), activation=tf.nn.softmax))
@@ -91,7 +93,7 @@ if __name__ == "__main__":
         loss="sparse_categorical_crossentropy",
         metrics=["accuracy"]
     )
-    model.fit(x_train, y_train, epochs=10)
+    model.fit(x_train, y_train, epochs=7)
     val_loss, val_acc = model.evaluate(x_test, y_test)
 
     predictions = model.predict([x_test])
