@@ -39,8 +39,6 @@ def get_prices(type_found):
         # options.add_argument("--no-sandbox")
         browser = webdriver.Chrome(options=options)
         
-
-
     browser.get(base_url)
 
     search_field = browser.find_element_by_tag_name('input')
@@ -49,6 +47,7 @@ def get_prices(type_found):
 
     sleep(0.5)
     select = Select(browser.find_element_by_id('filter-sorting'))
+    browser.implicitly_wait(1)
     # select by visible text
     select.select_by_visible_text('Billigst')
     sleep(1)
@@ -60,7 +59,14 @@ def get_prices(type_found):
     #Fetch the HTML and close the browser
     page_source = browser.page_source
     browser.quit()
+<<<<<<< HEAD
     
+=======
+    end1 = time.time()
+    print(end1 - start1)
+
+    start2 = time.time()
+>>>>>>> b6bd51f30dfe85769e016b9cd5572ef40b2b05a0
     soup = bs4.BeautifulSoup(page_source, 'html.parser')
 
     #Find all tags containing the wanted values. Tag name is equal to the value to the right.
@@ -87,8 +93,19 @@ def get_prices(type_found):
     
     for x in products:
         print(x)
+<<<<<<< HEAD
     
     return products
 
 if __name__ == "__main__":
     get_prices('avocado')
+=======
+    end2 = time.time()
+    end = time.time()
+    print(end2 - start2)
+    print(end - start)
+    return products
+
+if __name__ == "__main__":
+    get_info('Banan')
+>>>>>>> b6bd51f30dfe85769e016b9cd5572ef40b2b05a0
