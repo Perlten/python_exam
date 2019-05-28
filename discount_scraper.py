@@ -16,7 +16,7 @@ def trans(type_found):
         return "Æble"
     elif type_found == "orange":
         return "Appelsin"
-    elif type_found == "avocado":
+    elif type_found == "avokado":
         return "Avocado"
     elif type_found == "coffee":
         return "Kaffe"
@@ -33,10 +33,8 @@ def get_prices(type_found):
         browser = webdriver.Firefox(options=options)
     else:
         options = COptions()
-        # options.add_argument('--headless')
-        # options.add_argument("--disable-extensions")
-        # options.add_argument("--disable-gpu")
-        # options.add_argument("--no-sandbox")
+        options.add_argument("--headless")  
+        options.add_argument("--window-size=1920,1080")
         browser = webdriver.Chrome(options=options)
         
     browser.get(base_url)
