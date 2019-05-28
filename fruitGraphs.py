@@ -24,8 +24,8 @@ def graph_each_fruit_with_certainty_percent(df, label):
         count += 1
     # Display graph
     plt.title(f'{label} and their certainity %')
-    plt.xlabel(f'Each number is {label[:-1]} index guessed')
-    plt.ylabel("% Certain of guess")
+    plt.xlabel(f'Each number is index of {label[:-1]} guessed')
+    plt.ylabel(f"% Certainty of {label[:-1]}")
     plt.plot(fruit_graph.keys(), fruit_graph.values())
     plt.xticks(np.arange(1,len(df)+1, 1))
     plt.yticks(np.arange(0, 101, 10))
