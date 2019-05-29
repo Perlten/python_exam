@@ -10,7 +10,7 @@ import webbrowser
 from fruitDetect import detect_fruit
 from fruitSaver import save_fruit
 from discount_scraper import get_prices
-# from multiprocessing import Process
+from multiprocessing import Process, Queue
 
 from PIL import ImageFont, ImageDraw, Image
 
@@ -35,6 +35,8 @@ fruit_percents_guessed = None
 data_fetched = False
 flash = False
 keyframe_reset = False
+process = None
+dot_count = 0
 
 
 key_frame = []
@@ -43,24 +45,28 @@ last_frame = []
 
 def take_picture():
     # making sure to use the global image variable 
-    global image, data_fetched, flash
+    global image, flash
 
     # converting color output
     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     print("picture taken!")
     flash = True
 
-    data_fetched = False
     return image
 
 def predict_picture():
-    global type_found, time_found, found_confirmed, image, fruit_percents_guessed
+    global type_found, time_found, found_confirmed, image, fruit_percents_guessed, data_fetched
 
     image = take_picture()
-    type_found = detect_fruit(image)[0]
-    fruit_percents_guessed = detect_fruit(image)[1]
+
+    prediction = detect_fruit(image)
+    type_found = prediction[0]
+    fruit_percents_guessed = prediction[1]
+
     time_found = time.time()
+
     found_confirmed = False
+    data_fetched = False
 
 def handle_inputs():
     global auto, key_frame, found_confirmed, time_found, type_found, selected, prices, gray, keyframe_reset
@@ -114,7 +120,7 @@ def handle_inputs():
             
 
 def display_content():
-    global frame, f_width, f_height, type_found, prices, found_confirmed, label_height, label_width, time_found, selected, image, auto, last_frame, flash, keyframe_reset
+    global frame, f_width, f_height, type_found, prices, found_confirmed, label_height, label_width, time_found, selected, image, auto, last_frame, flash, keyframe_reset, process, dot_count
     
     # copying frame
     dframe = copy.copy(frame)
@@ -147,8 +153,6 @@ def display_content():
             if counter < 0:
                 found_confirmed = True
                 time_found = None
-
-                #TODO move to other logic
                 
             # If not, display the counter
             else:
@@ -166,10 +170,18 @@ def display_content():
         elif len(image) == 0:
             text_color = (215,215,215)
             
-            
-
         # Displaying type text 
         cv2.putText(dframe, display_found, (int(f_width/2) - indent, (f_height-30)), font, 1.5, text_color, 5, cv2.LINE_AA)
+
+    
+    if process:
+        dot_count += 1
+        # Display store
+        dots = "." * (dot_count % 5)
+        cv2.putText(dframe, f"Searching for products{dots}", (15,25), font, 0.4, (0,255,255), 1, cv2.LINE_AA)
+    else:
+        dot_count = 0
+
 
     # Value for relative height position 
     height_pos = 0
@@ -198,7 +210,7 @@ def display_content():
     return dframe
 
 def start():
-    global frame, type_found, time_found, found_confirmed, prices, selected,label_height, label_width, f_width, f_height, key_frame, image, gray, auto, DELTA_FREQUENCY, MOVEMENT_SENSITIVITY, KEYFRAME_DELTA_SENSITIVITY, data_fetched, last_frame
+    global frame, type_found, time_found, found_confirmed, prices, selected,label_height, label_width, f_width, f_height, key_frame, image, gray, auto, DELTA_FREQUENCY, MOVEMENT_SENSITIVITY, KEYFRAME_DELTA_SENSITIVITY, data_fetched, last_frame, process
 
     cap = cv2.VideoCapture(0)
 
@@ -250,13 +262,21 @@ def start():
         handle_inputs()
 
         if found_confirmed and not data_fetched:
-                # webscraping for prices
-                prices = get_prices(type_found)
-
+            # webscraping for prices
+            if not process:
                 #Saving the fruit, giving the fruit label and the max % found
                 save_fruit(type_found, int(np.amax(fruit_percents_guessed*100)))
 
-                data_fetched = True
+                prices = []
+                q = Queue()
+                process = Process(target=get_prices, args=(type_found, q))
+                process.start()
+            else:
+                if not q.empty():
+                    prices = q.get()
+                    process.join()
+                    process = None
+                    data_fetched = True
 
         # if we have auto enabled
         if auto:
