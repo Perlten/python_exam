@@ -65,7 +65,7 @@ def load_labels():
     return np.unique(train_label_list)
 
 
-def rotate_images(image_array, feature_vector, rotation):
+def rotate_images(image_array, rotation):
     rotated_images = []
     for original_image in image_array:
         image = np.copy(original_image)
@@ -75,9 +75,7 @@ def rotate_images(image_array, feature_vector, rotation):
         rotated90 = cv2.warpAffine(image, M, (h, w))
         rotated_images.append(rotated90)
     
-    concate_array = np.concatenate((image_array, rotated_images))
-    concate_feature_vector = np.concatenate((feature_vector, feature_vector))
-    return concate_array, concate_feature_vector
+    return rotate_images
 
 
 if __name__ == "__main__":
@@ -88,29 +86,12 @@ if __name__ == "__main__":
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
 
-    con_arr,con_vec  = rotate_images(x_train, y_train, 90)
-    x_train = con_arr
-    y_train = con_vec
-    con_arr,con_vec  = rotate_images(x_train, y_train, 180)
-    x_train = con_arr
-    y_train = con_vec
-    con_arr,con_vec  = rotate_images(x_train, y_train, 270)
-    x_train = con_arr
-    y_train = con_vec
-    print(len(x_train))
-    # rotated_images = []
-    # for original_image in x_train:
-    #     image = np.copy(original_image)
-    #     (h, w) = image.shape[:2]
-    #     center = (w / 2, h / 2)
-    #     M = cv2.getRotationMatrix2D(center, 90, 1)
-    #     rotated90 = cv2.warpAffine(image, M, (h, w))
-    #     rotated_images.append(rotated90)
-    
-    # x_train = np.concatenate((x_train, rotated_images))
-    # y_train = np.concatenate((y_train, y_train))
-    # print(len(rotated_images))
-    # print(len(x_train))
+    rotate_array1 = rotate_images(x_train, 90)
+    rotate_array2 = rotate_images(x_train, 180)
+    rotate_array3 = rotate_images(x_train, 270)
+
+    x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
+    y_train = np.concatenate((y_train, y_train, y_train,  y_train))
 
     test_filelist = glob.glob(TEST_DATASET)
     test_label_list = [name.split("_")[0].split("/")[-1] for name in test_filelist]
