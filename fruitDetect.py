@@ -7,13 +7,13 @@ from tensorflow.keras.models import Model
 import glob
 from tensorflow.keras.models import load_model
 
-IMAGE_SIZE = 64
+IMAGE_SIZE = 50
 TRAIN_DATASET = "dataset9/train/*"
 TEST_DATASET = "dataset9/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
 BEST_MODEL_NAME = "71P.h5"
 
-MODEL = load_model(MODEL_NAME)
+MODEL = load_model(BEST_MODEL_NAME)
 
 def proccess_image(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
