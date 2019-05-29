@@ -21,7 +21,7 @@ def trans(type_found):
     elif type_found == "coffee":
         return "Kaffe"
 
-def get_prices(type_found, q):
+def get_prices(type_found, q=None):
     type_found = trans(type_found)
     print(type_found)
 
@@ -85,9 +85,10 @@ def get_prices(type_found, q):
     
     # for x in products:
     #     print(x)
-    
-    q.put(products)
-    # return products
+    if q:
+        q.put(products)
+    else:
+        return products
 
 if __name__ == "__main__":
     get_prices('avocado')
