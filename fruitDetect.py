@@ -7,13 +7,14 @@ from tensorflow.keras.models import Model
 import glob
 from tensorflow.keras.models import load_model
 
-IMAGE_SIZE = 50
+
+IMAGE_SIZE = 25
 TRAIN_DATASET = "dataset9/train/*"
 TEST_DATASET = "dataset9/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
 BEST_MODEL_NAME = "71P.h5"
 
-MODEL = load_model(MODEL_NAME)
+MODEL = load_model(BEST_MODEL_NAME)
 
 def proccess_image(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -64,14 +65,52 @@ def load_labels():
     return np.unique(train_label_list)
 
 
+def rotate_images(image_array, feature_vector, rotation):
+    rotated_images = []
+    for original_image in image_array:
+        image = np.copy(original_image)
+        (h, w) = image.shape[:2]
+        center = (w / 2, h / 2)
+        M = cv2.getRotationMatrix2D(center, rotation, 1)
+        rotated90 = cv2.warpAffine(image, M, (h, w))
+        rotated_images.append(rotated90)
+    
+    concate_array = np.concatenate((image_array, rotated_images))
+    concate_feature_vector = np.concatenate((feature_vector, feature_vector))
+    return concate_array, concate_feature_vector
+
+
 if __name__ == "__main__":
     global train_filelist, train_label_list
-
     fruit_labels = load_labels()
 
     x_train = import_images(train_filelist)
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
+
+    con_arr,con_vec  = rotate_images(x_train, y_train, 90)
+    x_train = con_arr
+    y_train = con_vec
+    con_arr,con_vec  = rotate_images(x_train, y_train, 180)
+    x_train = con_arr
+    y_train = con_vec
+    con_arr,con_vec  = rotate_images(x_train, y_train, 270)
+    x_train = con_arr
+    y_train = con_vec
+    print(len(x_train))
+    # rotated_images = []
+    # for original_image in x_train:
+    #     image = np.copy(original_image)
+    #     (h, w) = image.shape[:2]
+    #     center = (w / 2, h / 2)
+    #     M = cv2.getRotationMatrix2D(center, 90, 1)
+    #     rotated90 = cv2.warpAffine(image, M, (h, w))
+    #     rotated_images.append(rotated90)
+    
+    # x_train = np.concatenate((x_train, rotated_images))
+    # y_train = np.concatenate((y_train, y_train))
+    # print(len(rotated_images))
+    # print(len(x_train))
 
     test_filelist = glob.glob(TEST_DATASET)
     test_label_list = [name.split("_")[0].split("/")[-1] for name in test_filelist]
@@ -81,10 +120,8 @@ if __name__ == "__main__":
 
     model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(1000, activation=tf.nn.relu))
-    model.add(tf.keras.layers.Dense(700, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(400, activation=tf.nn.relu))
-    model.add(tf.keras.layers.Dense(200, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Dense(280, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(100, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(60, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(len(fruit_labels), activation=tf.nn.softmax))
