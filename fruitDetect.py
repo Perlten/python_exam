@@ -10,7 +10,10 @@ from tensorflow.keras.models import load_model
 IMAGE_SIZE = 64
 TRAIN_DATASET = "dataset9/train/*"
 TEST_DATASET = "dataset9/test1/*"
+MODEL_NAME = "fruitDetectModel.h5"
+BEST_MODEL_NAME = "71P.h5"
 
+MODEL = load_model(MODEL_NAME)
 
 def proccess_image(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -44,9 +47,8 @@ def import_images(filelist):
     return num_image
 
 def detect_fruit(image):
-    global fruit_labels
+    global fruit_labels, MODEL
     fruit_labels = load_labels()
-    MODEL = load_model("fruitDetectModel.h5")
     image = resize(image, IMAGE_SIZE)
     image = proccess_image(image)
 
@@ -56,6 +58,7 @@ def detect_fruit(image):
     return (fruit_labels[np.argmax(prediction)], prediction)
 
 def load_labels():
+    global train_filelist, train_label_list
     train_filelist = glob.glob(TRAIN_DATASET)
     train_label_list = [name.split("_")[0].split("/")[-1] for name in train_filelist]
     return np.unique(train_label_list)
@@ -63,10 +66,9 @@ def load_labels():
 
 if __name__ == "__main__":
     global train_filelist, train_label_list
+
     fruit_labels = load_labels()
 
-    train_filelist = glob.glob(TRAIN_DATASET)
-    train_label_list = [name.split("_")[0].split("/")[-1] for name in train_filelist]
     x_train = import_images(train_filelist)
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
@@ -79,8 +81,10 @@ if __name__ == "__main__":
 
     model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(220, activation=tf.nn.relu))
-    model.add(tf.keras.layers.Dense(180, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Dense(1000, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Dense(700, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Dense(400, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Dense(200, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(100, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(60, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(len(fruit_labels), activation=tf.nn.softmax))
@@ -89,11 +93,12 @@ if __name__ == "__main__":
         loss="sparse_categorical_crossentropy",
         metrics=["accuracy"]
     )
-    model.fit(x_train, y_train, epochs=10)
+    model.fit(x_train, y_train, epochs=7)
     val_loss, val_acc = model.evaluate(x_test, y_test)
+
     predictions = model.predict([x_test])
 
     for x in range(len(test_label_list)):
         pred_label = np.argmax(predictions[x])
         print("Thought it was:", fruit_labels[pred_label], "and was", test_label_list[x])
-    model.save("fruitDetectModel.h5")
+    model.save(MODEL_NAME)
