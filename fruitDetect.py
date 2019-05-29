@@ -84,17 +84,17 @@ if __name__ == "__main__":
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
 
-    rotate_array1 = rotate_images(x_train, 90)
-    print(rotate_array1.shape)
-    rotate_array2 = rotate_images(x_train, 180)
-    print(rotate_array2.shape)
-    rotate_array3 = rotate_images(x_train, 270)
-    print(rotate_array3.shape)
+    #rotate_array1 = rotate_images(x_train, 90)
+    #print(rotate_array1.shape)
+    #rotate_array2 = rotate_images(x_train, 180)
+    #print(rotate_array2.shape)
+    #rotate_array3 = rotate_images(x_train, 270)
+    #print(rotate_array3.shape)
     
-    print(len(y_train.shape))
-    x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
-    y_train = np.concatenate((y_train, y_train, y_train, y_train))
-    print(len(y_train))
+    #print(len(y_train.shape))
+    #x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
+    #y_train = np.concatenate((y_train, y_train, y_train, y_train))
+    #print(len(y_train))
 
     test_filelist = glob.glob(TEST_DATASET)
     test_label_list = [name.split("_")[0].split("/")[-1] for name in test_filelist]
