@@ -149,7 +149,6 @@ def display_content():
             # Calculate time remaining for countdown
             counter = int((time_found + 3) - time.time())
             
-            # If it goes under zero, accept the type found
             if counter < 0:
                 found_confirmed = True
                 time_found = None
@@ -160,7 +159,6 @@ def display_content():
 
     
     if type_found:
-        # Generate type text depending on confirmation
         text_color = (255,255,255)
         display_found = type_found
         indent = 80
@@ -170,7 +168,6 @@ def display_content():
         elif len(image) == 0:
             text_color = (215,215,215)
             
-        # Displaying type text 
         cv2.putText(dframe, display_found, (int(f_width/2) - indent, (f_height-30)), font, 1.5, text_color, 5, cv2.LINE_AA)
 
     
@@ -209,6 +206,17 @@ def display_content():
 
     return dframe
 
+
+def resize_and_scale(frame):
+    height = frame.shape[0]
+    width = frame.shape[1]
+    scale = 480 / height
+    new_width = width * scale
+    side_margin = int((width - new_width) / 2)
+    frame = frame[ :,side_margin : width - side_margin]
+    frame = cv2.resize(frame, (640,480))
+    return frame
+
 def start():
     global frame, type_found, time_found, found_confirmed, prices, selected,label_height, label_width, f_width, f_height, key_frame, image, gray, auto, DELTA_FREQUENCY, MOVEMENT_SENSITIVITY, KEYFRAME_DELTA_SENSITIVITY, data_fetched, last_frame, process
 
@@ -240,7 +248,8 @@ def start():
         # get frame
         ret, frame = cap.read()
 
-        frame = cv2.resize(frame, (640,480))
+        # frame = cv2.resize(frame, (640,480))
+        frame = resize_and_scale(frame)
         # convert to grayscale
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 

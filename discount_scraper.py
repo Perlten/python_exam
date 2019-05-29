@@ -7,9 +7,8 @@ from selenium.webdriver.firefox.options import Options as FOptions
 from selenium.webdriver.chrome.options import Options as COptions
 import platform
 
-# from py_translator import Translator
 
-def trans(type_found): 
+def translate(type_found): 
     if type_found == "banana":
         return "Banan"
     elif type_found == "apple":
@@ -20,9 +19,13 @@ def trans(type_found):
         return "Avocado"
     elif type_found == "coffee":
         return "Kaffe"
+    elif type_found == "milk":
+        return "Minimælk"
+
+    return type_found.capitalize()
 
 def get_prices(type_found, q=None):
-    type_found = trans(type_found)
+    type_found = translate(type_found)
     print(type_found)
 
     base_url = 'https://www.nemlig.com/'
