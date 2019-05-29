@@ -7,7 +7,7 @@ from tensorflow.keras.models import Model
 import glob
 from tensorflow.keras.models import load_model
 
-IMAGE_SIZE = 50
+IMAGE_SIZE = 64
 TRAIN_DATASET = "dataset9/train/*"
 TEST_DATASET = "dataset9/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
