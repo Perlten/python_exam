@@ -28,7 +28,11 @@ def handle_inputs():
 def take_picture():
     global counter
     name = f"{fruit_type}_{counter}"
+<<<<<<< HEAD
     cv2.imwrite(f"ralleImage/{name}.jpg", image)
+=======
+    cv2.imwrite(f"perltImage/{name}.jpg", image)
+>>>>>>> 1c9baaf1f8aad84b10fb1f92813716c3453552d4
     print(name)
     counter += 1
 

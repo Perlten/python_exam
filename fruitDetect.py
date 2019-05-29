@@ -7,7 +7,8 @@ from tensorflow.keras.models import Model
 import glob
 from tensorflow.keras.models import load_model
 
-IMAGE_SIZE = 50
+
+IMAGE_SIZE = 25
 TRAIN_DATASET = "dataset9/train/*"
 TEST_DATASET = "dataset9/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
@@ -64,14 +65,33 @@ def load_labels():
     return np.unique(train_label_list)
 
 
+def rotate_images(image_array, rotation):
+    rotated_images = []
+    for original_image in image_array:
+        image = np.copy(original_image)
+        (h, w) = image.shape[:2]
+        center = (w / 2, h / 2)
+        M = cv2.getRotationMatrix2D(center, rotation, 1)
+        rotated90 = cv2.warpAffine(image, M, (h, w))
+        rotated_images.append(rotated90)
+    
+    return rotate_images
+
+
 if __name__ == "__main__":
     global train_filelist, train_label_list
-
     fruit_labels = load_labels()
 
     x_train = import_images(train_filelist)
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
+
+    rotate_array1 = rotate_images(x_train, 90)
+    rotate_array2 = rotate_images(x_train, 180)
+    rotate_array3 = rotate_images(x_train, 270)
+
+    x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
+    y_train = np.concatenate((y_train, y_train, y_train,  y_train))
 
     test_filelist = glob.glob(TEST_DATASET)
     test_label_list = [name.split("_")[0].split("/")[-1] for name in test_filelist]
@@ -81,10 +101,8 @@ if __name__ == "__main__":
 
     model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(1000, activation=tf.nn.relu))
-    model.add(tf.keras.layers.Dense(700, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(400, activation=tf.nn.relu))
-    model.add(tf.keras.layers.Dense(200, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Dense(280, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(100, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(60, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(len(fruit_labels), activation=tf.nn.softmax))
