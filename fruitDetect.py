@@ -8,13 +8,13 @@ import glob
 from tensorflow.keras.models import load_model
 
 
-IMAGE_SIZE = 25
+IMAGE_SIZE = 28
 TRAIN_DATASET = "dataset10/train/*"
 TEST_DATASET = "dataset10/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
 BEST_MODEL_NAME = "71P.h5"
 
-MODEL = load_model(BEST_MODEL_NAME)
+MODEL = load_model(MODEL_NAME)
 
 def proccess_image(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -84,17 +84,17 @@ if __name__ == "__main__":
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
 
-    rotate_array1 = rotate_images(x_train, 90)
-    print(rotate_array1.shape)
-    rotate_array2 = rotate_images(x_train, 180)
-    print(rotate_array2.shape)
-    rotate_array3 = rotate_images(x_train, 270)
-    print(rotate_array3.shape)
+    # rotate_array1 = rotate_images(x_train, 90)
+    # print(rotate_array1.shape)
+    # rotate_array2 = rotate_images(x_train, 180)
+    # print(rotate_array2.shape)
+    # rotate_array3 = rotate_images(x_train, 270)
+    # print(rotate_array3.shape)
     
-    print(len(y_train.shape))
-    x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
-    y_train = np.concatenate((y_train, y_train, y_train, y_train))
-    print(len(y_train))
+    # print(len(y_train.shape))
+    # x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
+    # y_train = np.concatenate((y_train, y_train, y_train, y_train))
+    # print(len(y_train))
 
     test_filelist = glob.glob(TEST_DATASET)
     test_label_list = [name.split("_")[0].split("/")[-1] for name in test_filelist]
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         loss="sparse_categorical_crossentropy",
         metrics=["accuracy"]
     )
-    model.fit(x_train, y_train, epochs=2)
+    model.fit(x_train, y_train, epochs=5)
     val_loss, val_acc = model.evaluate(x_test, y_test)
 
     predictions = model.predict([x_test])
