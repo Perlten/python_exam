@@ -248,7 +248,7 @@ def start():
         ret, frame = cap.read()
 
         # frame = cv2.resize(frame, (640,480))
-        frame = resize_and_scale(frame)
+        # frame = resize_and_scale(frame)
         # convert to grayscale
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 

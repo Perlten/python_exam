@@ -10,12 +10,15 @@ from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, Conv2D,
 import random
 import pandas as pd
 from matplotlib import pyplot as plt
+from skimage.measure import compare_ssim
 
 IMAGE_SIZE = 50
-TRAIN_DATASET = "dataset10/train/*"
-TEST_DATASET = "dataset10/test1/*"
+TRAIN_DATASET = "dataset9/train/*"
+TEST_DATASET = "dataset9/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
 BEST_MODEL_NAME = "fruitDetectModel_84P.h5"
+MODEL = load_model(BEST_MODEL_NAME)
+
 
 
 def proccess_image(image):
@@ -50,19 +53,15 @@ def import_images(filelist):
 
 def detect_fruit(image):
     global fruit_labels, MODEL
-    # return ("banana", [0,0,0,1,0,0,0])
     fruit_labels = load_labels()
     image = resize(image, IMAGE_SIZE)
     image = proccess_image(image)
 
     image = np.array(image).reshape(IMAGE_SIZE, IMAGE_SIZE, 1)
 
-    # image = tf.keras.utils.normalize(image, axis=1)
     image = np.asarray([image])
-    print(image.shape)
-    # plt.imshow(image[0].reshape(IMAGE_SIZE,IMAGE_SIZE), cmap="gray")
-    # plt.show()
     prediction = MODEL.predict(image)
+    
     return (fruit_labels[np.argmax(prediction)], prediction)
 
 def load_labels():
@@ -89,9 +88,9 @@ if __name__ == "__main__":
     global train_filelist, train_label_list
     fruit_labels = load_labels()
 
-    x_train = import_images(train_filelist)
-    x_train = np.asarray([proccess_image(image) for image in x_train])
-    y_train = make_labels(train_label_list)
+    # x_train = import_images(train_filelist)
+    # x_train = np.asarray([proccess_image(image) for image in x_train])
+    # y_train = make_labels(train_label_list)
 
     # rotate_array1 = rotate_images(x_train, 90)
     # print(rotate_array1.shape)
@@ -112,42 +111,59 @@ if __name__ == "__main__":
     x_test = np.asarray([proccess_image(image) for image in x_test])
     y_test = make_labels(test_label_list)
 
-    x_train = np.array(x_train).reshape(-1, IMAGE_SIZE, IMAGE_SIZE, 1)
-    y_train = pd.Series(y_train)
-    y_train = pd.get_dummies(y_train.apply(pd.Series).stack()).sum(level=0)
-    print(x_train[1])
-    print(y_train[1])
+    # x_train = np.array(x_train).reshape(-1, IMAGE_SIZE, IMAGE_SIZE, 1)
+    # y_train = pd.Series(y_train)
+    # y_train = pd.get_dummies(y_train.apply(pd.Series).stack()).sum(level=0)
+    # print(x_train[1])
+    # print(y_train[1])
 
     x_test = np.array(x_test).reshape(-1, IMAGE_SIZE, IMAGE_SIZE, 1)
     y_test = pd.Series(y_test)
     y_test = pd.get_dummies(y_test.apply(pd.Series).stack()).sum(level=0)
 
-    model = tf.keras.models.Sequential()
-    model.add(Conv2D(64, (3,3), input_shape=x_train.shape[1:]))
-    model.add(Activation("relu"))
-    model.add(MaxPooling2D(pool_size=(2,2)))
+    # plt.imshow(x_test[0].reshape(IMAGE_SIZE,IMAGE_SIZE), cmap="gray")
+    # plt.show()
 
-    model.add(Conv2D(64, (3,3)))
-    model.add(Activation("relu"))
-    model.add(MaxPooling2D(pool_size=(2,2)))
+    # model = tf.keras.models.Sequential()
+    # model.add(Conv2D(64, (3,3), input_shape=x_train.shape[1:]))
+    # model.add(Activation("relu"))
+    # model.add(MaxPooling2D(pool_size=(2,2)))
 
-    model.add(Flatten())
-    model.add(Dense(64))
-    model.add(Dense(len(fruit_labels)))
-    model.add(Activation("sigmoid"))
-    model.compile(
-        optimizer="adam",
-        loss="binary_crossentropy",
-        metrics=["accuracy"]
-    )
-    model.fit(x_train, y_train, batch_size=700, validation_split=0.1, epochs=3)
-    val_loss, val_acc = model.evaluate(x_test, y_test)
+    # model.add(Conv2D(64, (3,3)))
+    # model.add(Activation("relu"))
+    # model.add(MaxPooling2D(pool_size=(2,2)))
 
-    predictions = model.predict([x_test])
-    print("pred:",predictions)
-    for x in range(len(test_label_list)):
-        pred_label = np.argmax(predictions[x])
-        print("Thought it was:", fruit_labels[pred_label], "and was", test_label_list[x])
-    model.save(MODEL_NAME)
-else:
-    MODEL = load_model(BEST_MODEL_NAME)
+    # model.add(Flatten())
+    # model.add(Dense(64))
+    # model.add(Dense(len(fruit_labels)))
+    # model.add(Activation("sigmoid"))
+    # model.compile(
+    #     optimizer="adam",
+    #     loss="binary_crossentropy",
+    #     metrics=["accuracy"]
+    # )
+    # model.fit(x_train, y_train, batch_size=700, validation_split=0.1, epochs=3)
+    val_loss, val_acc = MODEL.evaluate(x_test, y_test)
+
+    he = "dataset10/test1/*"
+    train_filelist = glob.glob(he)
+    train_label_list = [name.split("_")[0].split("/")[-1] for name in train_filelist]
+    num_image = [cv2.imread(fname) for fname in train_filelist]
+    
+    correct_ans = 0
+    count = 0
+    for x, image in enumerate(x_test):
+        prediction = MODEL.predict(np.asarray([image]))
+        ans, pre = (fruit_labels[np.argmax(prediction)], prediction)
+        if train_label_list[x] == ans:
+            correct_ans += 1
+        count += 1
+
+    print(correct_ans / count )
+
+    # predictions = model.predict([x_test])
+    # print("pred:",predictions)
+    # for x in range(len(test_label_list)):
+    #     pred_label = np.argmax(predictions[x])
+    #     print("Thought it was:", fruit_labels[pred_label], "and was", test_label_list[x])
+    # model.save(MODEL_NAME)
