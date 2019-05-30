@@ -11,7 +11,6 @@ from fruitDetect import detect_fruit
 from fruitSaver import save_fruit
 from discount_scraper import get_prices
 from multiprocessing import Process, Queue
-
 from PIL import ImageFont, ImageDraw, Image
 
 # Constants
