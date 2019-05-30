@@ -11,21 +11,12 @@ import random
 import pandas as pd
 from matplotlib import pyplot as plt
 
-<<<<<<< HEAD
 IMAGE_SIZE = 50
-=======
-
-IMAGE_SIZE = 28
->>>>>>> 464d2c71a02b8a9ec9f08e37b012e812c3544b2d
 TRAIN_DATASET = "dataset10/train/*"
 TEST_DATASET = "dataset10/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
 BEST_MODEL_NAME = "fruitDetectModel_84P.h5"
 
-<<<<<<< HEAD
-=======
-MODEL = load_model(MODEL_NAME)
->>>>>>> 464d2c71a02b8a9ec9f08e37b012e812c3544b2d
 
 def proccess_image(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
