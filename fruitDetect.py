@@ -11,12 +11,21 @@ import random
 import pandas as pd
 from matplotlib import pyplot as plt
 
+<<<<<<< HEAD
 IMAGE_SIZE = 50
+=======
+
+IMAGE_SIZE = 28
+>>>>>>> 464d2c71a02b8a9ec9f08e37b012e812c3544b2d
 TRAIN_DATASET = "dataset10/train/*"
 TEST_DATASET = "dataset10/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
 BEST_MODEL_NAME = "fruitDetectModel_84P.h5"
 
+<<<<<<< HEAD
+=======
+MODEL = load_model(MODEL_NAME)
+>>>>>>> 464d2c71a02b8a9ec9f08e37b012e812c3544b2d
 
 def proccess_image(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -93,17 +102,17 @@ if __name__ == "__main__":
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
 
-    rotate_array1 = rotate_images(x_train, 90)
-    print(rotate_array1.shape)
-    rotate_array2 = rotate_images(x_train, 180)
-    print(rotate_array2.shape)
-    rotate_array3 = rotate_images(x_train, 270)
-    print(rotate_array3.shape)
+    # rotate_array1 = rotate_images(x_train, 90)
+    # print(rotate_array1.shape)
+    # rotate_array2 = rotate_images(x_train, 180)
+    # print(rotate_array2.shape)
+    # rotate_array3 = rotate_images(x_train, 270)
+    # print(rotate_array3.shape)
     
-    print(len(y_train.shape))
-    x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
-    y_train = np.concatenate((y_train, y_train, y_train, y_train))
-    print(len(y_train))
+    # print(len(y_train.shape))
+    # x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
+    # y_train = np.concatenate((y_train, y_train, y_train, y_train))
+    # print(len(y_train))
 
 
     test_filelist = glob.glob(TEST_DATASET)

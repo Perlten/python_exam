@@ -31,14 +31,18 @@ def get_prices(type_found, q=None):
     base_url = 'https://www.nemlig.com/'
 
     # if platform.system() == "Linux":
-    #     options = FOptions()
-    #     options.add_argument('--headless')
-    #     browser = webdriver.Firefox(options=options)
+    # options = FOptions()
+    # options.add_argument('--headless')
+    # browser = webdriver.Firefox(options=options)
     # else:
     options = COptions()
-    options.add_argument("--headless")  
+    options.add_argument("--headless")
     options.add_argument("--window-size=1920,1080")
-    browser = webdriver.Chrome(options=options)
+    if platform.system() == "Linux":
+        options.add_argument('--no-sandbox')
+        browser = webdriver.Chrome( options = options, executable_path="/usr/bin/chromedriver")
+    else:
+        browser = webdriver.Chrome( options = options)
         
     browser.get(base_url)
     browser.implicitly_wait(5)
@@ -50,8 +54,9 @@ def get_prices(type_found, q=None):
     # sleep(0.5)
     select = Select(browser.find_element_by_id('filter-sorting'))
     # select by visible text
+    # sleep(2)
     select.select_by_visible_text('Billigst')
-    # sleep(1)
+    # sleep(2)
 
 
     # browser.find_element_by_xpath("//a[@class='productlist-item__link']").click()
@@ -86,12 +91,12 @@ def get_prices(type_found, q=None):
             products.append((price_decimals, name, link))
             # print(f"{price}.{decimals} - {name} - {link}")
     
-    # for x in products:
-    #     print(x)
+    for x in products:
+        print(x)
     if q:
         q.put(products)
     else:
         return products
 
 if __name__ == "__main__":
-    get_prices('avocado')
+    get_prices('avokado')
