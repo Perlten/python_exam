@@ -33,7 +33,7 @@ def get_prices(type_found, q=None):
     # if platform.system() == "Linux":
     # options = FOptions()
     # options.add_argument('--headless')
-    # browser = webdriver.Firefox(options=options)
+    #browser = webdriver.Firefox(options=options)
     # else:
     options = COptions()
     options.add_argument("--headless")
