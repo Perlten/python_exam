@@ -22,13 +22,13 @@ def handle_inputs():
             take_image = False
         else: 
             take_image = True
-        # take_picture()
+        take_picture()
         time.sleep(0.1)
 
 def take_picture():
     global counter
     name = f"{fruit_type}_{counter}"
-    cv2.imwrite(f"ralleImage/{name}.jpg", image)
+    cv2.imwrite(f"preTest/{name}.jpg", image)
     print(name)
     counter += 1
 
@@ -48,9 +48,9 @@ def start(fruit_type_arg, counter_arg):
         image = frame
         cv2.imshow('frame',image)
         handle_inputs()
-        if take_image: 
-            take_picture()
-            time.sleep(0.1)
+        ##if take_image: 
+        ##    take_picture()
+          ##  time.sleep(0.1)
         cv2.waitKey(1)
     
     cap.release()

@@ -58,6 +58,9 @@ def predict_picture():
 
     image = take_picture()
 
+    # cv2.imwrite(f"tempImage/image.jpg", frame)
+    # image = cv2.imread("tempImage/image.jpg")
+
     prediction = detect_fruit(image)
     type_found = prediction[0]
     fruit_percents_guessed = prediction[1]
@@ -248,7 +251,7 @@ def start():
         ret, frame = cap.read()
 
         # frame = cv2.resize(frame, (640,480))
-        frame = resize_and_scale(frame)
+        # frame = resizresize_and_scalee_and_scale(frame)
         # convert to grayscale
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
