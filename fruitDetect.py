@@ -15,13 +15,13 @@ IMAGE_SIZE = 50
 TRAIN_DATASET = "dataset10/train/*"
 TEST_DATASET = "dataset10/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
-BEST_MODEL_NAME = "fruitDetectModel_84P.h5"
+BEST_MODEL_NAME = "fruitDetectModel_82P_2.h5"
 train_filelist = []
 train_label_list = []
 
 
 def proccess_image(image):
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     image = tf.keras.utils.normalize([image], axis=1)[0]
     return image
 
@@ -51,14 +51,19 @@ def import_images(filelist):
     return num_image
 
 def detect_fruit(image):
-    global fruit_labels
+    global fruit_labels, MODEL
+    # return ("banana", [0,0,0,1,0,0,0])
     fruit_labels = load_labels()
     image = resize(image, IMAGE_SIZE)
     image = proccess_image(image)
 
     image = np.array(image).reshape(IMAGE_SIZE, IMAGE_SIZE, 1)
 
+    # image = tf.keras.utils.normalize(image, axis=1)
     image = np.asarray([image])
+    print(image.shape)
+    # plt.imshow(image[0].reshape(IMAGE_SIZE,IMAGE_SIZE), cmap="gray")
+    # plt.show()
     prediction = MODEL.predict(image)
     return (fruit_labels[np.argmax(prediction)], prediction)
 
@@ -90,17 +95,17 @@ if __name__ == "__main__":
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
 
-#     # rotate_array1 = rotate_images(x_train, 90)
-#     # print(rotate_array1.shape)
-#     # rotate_array2 = rotate_images(x_train, 180)
-#     # print(rotate_array2.shape)
-#     # rotate_array3 = rotate_images(x_train, 270)
-#     # print(rotate_array3.shape)
+    rotate_array1 = rotate_images(x_train, 90)
+    print(rotate_array1.shape)
+    rotate_array2 = rotate_images(x_train, 180)
+    print(rotate_array2.shape)
+    rotate_array3 = rotate_images(x_train, 270)
+    print(rotate_array3.shape)
     
-    # print(len(y_train.shape))
-    # x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
-    # y_train = np.concatenate((y_train, y_train, y_train, y_train))
-    # print(len(y_train))
+    print(len(y_train.shape))
+    x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
+    y_train = np.concatenate((y_train, y_train, y_train, y_train))
+    print(len(y_train))
 
 
     test_filelist = glob.glob(TEST_DATASET)
@@ -118,13 +123,14 @@ if __name__ == "__main__":
     x_test = np.array(x_test).reshape(-1, IMAGE_SIZE, IMAGE_SIZE, 1)
     y_test = pd.Series(y_test)
     y_test = pd.get_dummies(y_test.apply(pd.Series).stack()).sum(level=0)
+    print("y_test", y_test)
 
     model = tf.keras.models.Sequential()
-    model.add(Conv2D(64, (3,3), input_shape=x_train.shape[1:]))
+    model.add(Conv2D(64, (4,4), input_shape=x_train.shape[1:]))
     model.add(Activation("relu"))
     model.add(MaxPooling2D(pool_size=(2,2)))
 
-    model.add(Conv2D(64, (3,3)))
+    model.add(Conv2D(64, (4,4)))
     model.add(Activation("relu"))
     model.add(MaxPooling2D(pool_size=(2,2)))
 
@@ -137,7 +143,7 @@ if __name__ == "__main__":
         loss="binary_crossentropy",
         metrics=["accuracy"]
     )
-    model.fit(x_train, y_train, batch_size=700, validation_split=0.1, epochs=3)
+    model.fit(x_train, y_train, batch_size=100, validation_split=0.1, epochs=8)
     val_loss, val_acc = model.evaluate(x_test, y_test)
 
     predictions = model.predict([x_test])
@@ -148,8 +154,3 @@ if __name__ == "__main__":
     model.save(MODEL_NAME)
 else:
     MODEL = load_model(BEST_MODEL_NAME)
-
-
-
-
-
