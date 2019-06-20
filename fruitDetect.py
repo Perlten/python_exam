@@ -16,8 +16,6 @@ TRAIN_DATASET = "dataset10/train/*"
 TEST_DATASET = "dataset10/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
 BEST_MODEL_NAME = "fruitDetectModel_84P.h5"
-train_filelist = []
-train_label_list = []
 
 
 def proccess_image(image):
