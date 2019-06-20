@@ -12,6 +12,8 @@ from fruitSaver import save_fruit
 from discount_scraper import get_prices
 from multiprocessing import Process, Queue
 from PIL import ImageFont, ImageDraw, Image
+import os
+import platform
 
 # Constants
 DELTA_FREQUENCY = 30
@@ -57,6 +59,9 @@ def predict_picture():
     global type_found, time_found, found_confirmed, image, fruit_percents_guessed, data_fetched
 
     image = take_picture()
+
+    # cv2.imwrite(f"tempImage/image.jpg", frame)
+    # image = cv2.imread("tempImage/image.jpg")
 
     prediction = detect_fruit(image)
     type_found = prediction[0]
@@ -114,9 +119,11 @@ def handle_inputs():
         
         if keyboard.is_pressed("enter"):
             if 2 < len(prices[selected]):
-                webbrowser.open(prices[selected][2])
-            
-            
+
+                if platform.system() == "Linux":
+                    os.system(f'google-chrome {prices[selected][2]} --no-sandbox')
+                else:
+                    webbrowser.open(prices[selected][2])
 
 def display_content():
     global frame, f_width, f_height, type_found, prices, found_confirmed, label_height, label_width, time_found, selected, image, auto, last_frame, flash, keyframe_reset, process, dot_count
@@ -248,7 +255,7 @@ def start():
         ret, frame = cap.read()
 
         # frame = cv2.resize(frame, (640,480))
-        frame = resize_and_scale(frame)
+        # frame = resizresize_and_scalee_and_scale(frame)
         # convert to grayscale
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 

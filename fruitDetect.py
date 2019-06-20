@@ -19,7 +19,7 @@ BEST_MODEL_NAME = "fruitDetectModel_84P.h5"
 
 
 def proccess_image(image):
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
     image = tf.keras.utils.normalize([image], axis=1)[0]
     return image
 
@@ -49,19 +49,14 @@ def import_images(filelist):
     return num_image
 
 def detect_fruit(image):
-    global fruit_labels, MODEL
-    # return ("banana", [0,0,0,1,0,0,0])
+    global fruit_labels
     fruit_labels = load_labels()
     image = resize(image, IMAGE_SIZE)
     image = proccess_image(image)
 
     image = np.array(image).reshape(IMAGE_SIZE, IMAGE_SIZE, 1)
 
-    # image = tf.keras.utils.normalize(image, axis=1)
     image = np.asarray([image])
-    print(image.shape)
-    # plt.imshow(image[0].reshape(IMAGE_SIZE,IMAGE_SIZE), cmap="gray")
-    # plt.show()
     prediction = MODEL.predict(image)
     return (fruit_labels[np.argmax(prediction)], prediction)
 
@@ -93,12 +88,12 @@ if __name__ == "__main__":
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
 
-    # rotate_array1 = rotate_images(x_train, 90)
-    # print(rotate_array1.shape)
-    # rotate_array2 = rotate_images(x_train, 180)
-    # print(rotate_array2.shape)
-    # rotate_array3 = rotate_images(x_train, 270)
-    # print(rotate_array3.shape)
+#     # rotate_array1 = rotate_images(x_train, 90)
+#     # print(rotate_array1.shape)
+#     # rotate_array2 = rotate_images(x_train, 180)
+#     # print(rotate_array2.shape)
+#     # rotate_array3 = rotate_images(x_train, 270)
+#     # print(rotate_array3.shape)
     
     # print(len(y_train.shape))
     # x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
@@ -151,3 +146,8 @@ if __name__ == "__main__":
     model.save(MODEL_NAME)
 else:
     MODEL = load_model(BEST_MODEL_NAME)
+
+
+
+
+

@@ -8,8 +8,6 @@ df = pd.read_csv('fruit_database.csv')
 
 # insert dataframe, which index, name of fruit
 # example: df=df, index='fruit', fruit='banana'
-
-
 def fruit_mask(df, index, fruit):
     return df[index] == fruit
 
@@ -34,9 +32,6 @@ def graph_each_fruit_with_certainty_percent(df, label):
 #Making it into a module :)
 def graph_file():
 #1) Graph that shows how many banana, orange, apples have been chosen, x=fruit, y=amount
-# Autistic solution, wouldt recommend as u will choke in exam if ur asked to explain
-# fruit_dir = {fruit_dir.setdefault(row['fruit'], len(df[fruit_mask(df, 'fruit', row['fruit'])])) for i,row in df.iterrows()}
-# simpler solution, we should use this
     fruit_dir = {}
     for i, row in df.iterrows():
         fruit_dir.setdefault(row['fruit'], len(
@@ -91,30 +86,32 @@ def graph_file():
     plt.xticks(ind, certainty_dir.keys())
     plt.yticks(np.arange(0, 101, 10))
 
+
+    #OUT COMMENTED NOT TO SPAM WITH GRAPHS :)
     #3) Takes a set of df[fruit] to find all fruit names, used to create a dynamic solution that
     # shows fruits and their certainty for each recognition theyve had in the network
     #  all fruits are in this case shown together
     #dynamic solution, looks at allf ruits and plots afterwards
-    data = set(df['fruit'])
-    longest = 0
-    plt.figure()
-    for x in data:
-        element = df[fruit_mask(df, 'fruit', x)]
-        count = 1
-        fruit_graph = {}
-        # Iter over banana dataset and create dict with bananas and % guessed
-        for i, row in element.iterrows():
-            fruit_graph[count] = row['certainty_level %']
-            count += 1
-        # Display graph
-        if(len(fruit_graph) > longest):
-            longest = len(fruit_graph)
-        plt.plot(fruit_graph.keys(), fruit_graph.values(), label=x, marker='o')
+    # data = set(df['fruit'])
+    # longest = 0
+    # plt.figure()
+    # for x in data:
+    #     element = df[fruit_mask(df, 'fruit', x)]
+    #     count = 1
+    #     fruit_graph = {}
+    #     # Iter over banana dataset and create dict with bananas and % guessed
+    #     for i, row in element.iterrows():
+    #         fruit_graph[count] = row['certainty_level %']
+    #         count += 1
+    #     # Display graph
+    #     if(len(fruit_graph) > longest):
+    #         longest = len(fruit_graph)
+    #     plt.plot(fruit_graph.keys(), fruit_graph.values(), label=x, marker='o')
 
-    plt.legend()
-    plt.title(f'Fruits and their certainity %')
-    plt.yticks(np.arange(0, 101, 10))
-    plt.xticks(np.arange(1, longest+1, 1))
+    # plt.legend()
+    # plt.title(f'Fruits and their certainity %')
+    # plt.yticks(np.arange(0, 101, 10))
+    # plt.xticks(np.arange(1, longest+1, 1))
 
     #4) calls function on each fruit name and displays it as a graph
     #dynamic solution for each fruit in the dataset
