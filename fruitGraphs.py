@@ -34,9 +34,6 @@ def graph_each_fruit_with_certainty_percent(df, label):
 #Making it into a module :)
 def graph_file():
 #1) Graph that shows how many banana, orange, apples have been chosen, x=fruit, y=amount
-# Autistic solution, wouldt recommend as u will choke in exam if ur asked to explain
-# fruit_dir = {fruit_dir.setdefault(row['fruit'], len(df[fruit_mask(df, 'fruit', row['fruit'])])) for i,row in df.iterrows()}
-# simpler solution, we should use this
     fruit_dir = {}
     for i, row in df.iterrows():
         fruit_dir.setdefault(row['fruit'], len(

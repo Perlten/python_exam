@@ -12,6 +12,8 @@ from fruitSaver import save_fruit
 from discount_scraper import get_prices
 from multiprocessing import Process, Queue
 from PIL import ImageFont, ImageDraw, Image
+import os
+import platform
 
 # Constants
 DELTA_FREQUENCY = 30
@@ -117,9 +119,11 @@ def handle_inputs():
         
         if keyboard.is_pressed("enter"):
             if 2 < len(prices[selected]):
-                webbrowser.open(prices[selected][2])
-            
-            
+
+                if platform.system() == "Linux":
+                    os.system(f'google-chrome {prices[selected][2]} --no-sandbox')
+                else:
+                    webbrowser.open(prices[selected][2])
 
 def display_content():
     global frame, f_width, f_height, type_found, prices, found_confirmed, label_height, label_width, time_found, selected, image, auto, last_frame, flash, keyframe_reset, process, dot_count
