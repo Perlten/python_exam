@@ -60,9 +60,6 @@ def predict_picture():
 
     image = take_picture()
 
-    # cv2.imwrite(f"tempImage/image.jpg", frame)
-    # image = cv2.imread("tempImage/image.jpg")
-
     prediction = detect_fruit(image)
     type_found = prediction[0]
     fruit_percents_guessed = prediction[1]
@@ -124,7 +121,7 @@ def handle_inputs():
                     os.system(f'google-chrome {prices[selected][2]} --no-sandbox &')
                 else:
                     webbrowser.open(prices[selected][2])
-
+            time.sleep(0.4)
 def display_content():
     global frame, f_width, f_height, type_found, prices, found_confirmed, label_height, label_width, time_found, selected, image, auto, last_frame, flash, keyframe_reset, process, dot_count
     
@@ -136,19 +133,24 @@ def display_content():
     auto_text = "auto on" if auto else "auto off"
     cv2.putText(dframe, auto_text, (5,f_height -5), font, 0.7, (255,0,0), 1, cv2.LINE_AA)
 
+    #If object is detected, make green border around frame
     if len(last_frame) > 0:
         frame_color = (0,255,0)
+    #if picture is taken, change border to yeeeellow
         if len(image) > 0:
             frame_color = (0,255,255)
         cv2.rectangle(dframe, (0,0), (f_width,f_height), frame_color , 2)
 
+     #Flahes if pic is taken
     if flash:
         cv2.rectangle(dframe, (0,0), (f_width,f_height), (255,255,255), -1)
         flash = False
 
+    #Blue border appears
     if keyframe_reset:
         cv2.rectangle(dframe, (0,0), (f_width,f_height), (255,0,0) , 2)
         keyframe_reset = False
+
 
     if not found_confirmed: 
         if time_found:
@@ -247,14 +249,11 @@ def start():
     # selection
     selected = 0
     
-    # p = Process(target=handle_inputs)
-    # p.start()
     
     while True:
         # get frame
         ret, frame = cap.read()
 
-        # frame = cv2.resize(frame, (640,480))
         # frame = resizresize_and_scalee_and_scale(frame)
         # convert to grayscale
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)

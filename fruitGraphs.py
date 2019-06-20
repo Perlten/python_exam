@@ -8,34 +8,15 @@ df = pd.read_csv('fruit_database.csv')
 
 # insert dataframe, which index, name of fruit
 # example: df=df, index='fruit', fruit='banana'
-def fruit_mask(df, index, fruit):
-    return df[index] == fruit
-
-
-def graph_each_fruit_with_certainty_percent(df, label):
-    plt.figure()
-    count = 1
-    fruit_graph = {}
-    label = label.capitalize()
-    # Iter over banana dataset and create dict with bananas aplt.show()nd % guessed
-    for i, row in df.iterrows():
-        fruit_graph[count] = row['certainty_level %']
-        count += 1
-    # Display graph
-    plt.title(f'{label} and their certainity %')
-    plt.xlabel(f'Each number is index of {label[:-1]} guessed')
-    plt.ylabel(f"% Certainty of {label[:-1]}")
-    plt.plot(fruit_graph.keys(), fruit_graph.values())
-    plt.xticks(np.arange(1,len(df)+1, 1))
-    plt.yticks(np.arange(0, 101, 10))
+def fruit_mask(df, column, fruit):
+    return df[column] == fruit
 
 #Making it into a module :)
 def graph_file():
 #1) Graph that shows how many banana, orange, apples have been chosen, x=fruit, y=amount
     fruit_dir = {}
     for i, row in df.iterrows():
-        fruit_dir.setdefault(row['fruit'], len(
-            df[fruit_mask(df, 'fruit', row['fruit'])]))
+        fruit_dir.setdefault(row['fruit'], len(df[fruit_mask(df, 'fruit', row['fruit'])]))
 
     # the x locations for the groups
     plt.figure()
@@ -46,8 +27,7 @@ def graph_file():
     plt.ylabel('Found amount of times')
     plt.title('See how many times each fruit has been scanned')
     plt.xticks(ind, fruit_dir.keys())
-    max_value_from_dir = fruit_dir[max(
-        fruit_dir.items(), key=operator.itemgetter(1))[0]]
+    max_value_from_dir = fruit_dir[max(fruit_dir.items(), key=operator.itemgetter(1))[0]]
     plt.yticks(np.arange(0, max_value_from_dir, 5))
 
     #2) Graph that shows average % certainty when each fruit is chosen, fx banana: 57%, apple 42%, orange 44%, x=fruit, y = %
@@ -90,33 +70,28 @@ def graph_file():
     #3) Takes a set of df[fruit] to find all fruit names, used to create a dynamic solution that
     # shows fruits and their certainty for each recognition theyve had in the network
     #  all fruits are in this case shown together
-    #dynamic solution, looks at allf ruits and plots afterwards
-    data = set(df['fruit'])
+    fruit_list = set(df['fruit'])
     longest = 0
     plt.figure()
-    for x in data:
-        element = df[fruit_mask(df, 'fruit', x)]
+    for fruit in fruit_list:
+        elements = df[fruit_mask(df, 'fruit', fruit)]
         count = 1
         fruit_graph = {}
-        # Iter over banana dataset and create dict with bananas and % guessed
-        for i, row in element.iterrows():
+
+        for i, row in elements.iterrows():
             fruit_graph[count] = row['certainty_level %']
             count += 1
         # Display graph
         if(len(fruit_graph) > longest):
             longest = len(fruit_graph)
-        plt.plot(fruit_graph.keys(), fruit_graph.values(), label=x, marker='o')
+        plt.plot(fruit_graph.keys(), fruit_graph.values(), label=fruit, marker='o')
 
     plt.legend()
     plt.title(f'Fruits and their certainity %')
     plt.yticks(np.arange(0, 101, 10))
     plt.xticks(np.arange(1, longest+1, 1))
 
-    #4) calls function on each fruit name and displays it as a graph
-    #dynamic solution for each fruit in the dataset
-    # for i in data:
-    #     graph_each_fruit_with_certainty_percent(df[fruit_mask(df, 'fruit', i)], i.capitalize()+'s')
-
+    
     plt.show()
 
 

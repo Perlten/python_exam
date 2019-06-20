@@ -3,7 +3,6 @@ from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
-from selenium.webdriver.firefox.options import Options as FOptions
 from selenium.webdriver.chrome.options import Options as COptions
 import platform
 
@@ -26,18 +25,11 @@ def translate(type_found):
 
 def get_prices(type_found, q=None):
     type_found = translate(type_found)
-    print(type_found)
 
     base_url = 'https://www.nemlig.com/'
 
-    # -if platform.system() == "Linux":t.py", line 88, in handle_inputs
-    #cap.release()
-    # options = FOptions()
-    # options.add_argument('--headless')
-    #browser = webdriver.Firefox(options=options)
-    # else:
     options = COptions()
-    options.add_argument("--headless")
+    #options.add_argument("--headless")
     options.add_argument("--window-size=1920,1080")
     if platform.system() == "Linux":
         options.add_argument('--no-sandbox')
@@ -52,16 +44,8 @@ def get_prices(type_found, q=None):
     search_field.send_keys(type_found)
     search_field.submit()
 
-    # sleep(0.5)
     select = Select(browser.find_element_by_id('filter-sorting'))
-    # select by visible text
-    # sleep(2)
     select.select_by_visible_text('Billigst')
-    # sleep(2)
-
-
-    # browser.find_element_by_xpath("//a[@class='productlist-item__link']").click()
-    # sleep(1)
 
     #Fetch the HTML and close the browser
     page_source = browser.page_source
@@ -80,7 +64,6 @@ def get_prices(type_found, q=None):
     for i, product in enumerate(name_cells):
         name = product.getText()
         if name.startswith(type_found) and counter < 4:
-            #TODO maybe use i instaed of counter? love u rallemiz
             counter += 1
             #Take the values out of the given tags
             price = price_cells[i].select("span")[0].getText()
@@ -90,7 +73,6 @@ def get_prices(type_found, q=None):
             #Add it all to a list as tuples
             price_decimals = float(f'{price}.{decimals}')
             products.append((price_decimals, name, link))
-            # print(f"{price}.{decimals} - {name} - {link}")
     
     for x in products:
         print(x)
@@ -100,4 +82,4 @@ def get_prices(type_found, q=None):
         return products
 
 if __name__ == "__main__":
-    get_prices('avokado')
+    get_prices('banana')

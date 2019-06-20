@@ -12,8 +12,8 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 IMAGE_SIZE = 50
-TRAIN_DATASET = "dataset10/train/*"
-TEST_DATASET = "dataset10/test1/*"
+TRAIN_DATASET = "dataset5/train/*"
+TEST_DATASET = "dataset5/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
 BEST_MODEL_NAME = "fruitDetectModel_84P.h5"
 
@@ -45,12 +45,10 @@ def get_index_from_type(fruit_type:str):
 
 
 def import_images(filelist):
-    num_image = np.array([resize(cv2.imread(fname), IMAGE_SIZE) for fname in filelist])
-    return num_image
+    num_images = np.array([resize(cv2.imread(fname), IMAGE_SIZE) for fname in filelist])
+    return num_images
 
 def detect_fruit(image):
-    global fruit_labels
-    fruit_labels = load_labels()
     image = resize(image, IMAGE_SIZE)
     image = proccess_image(image)
 
@@ -75,8 +73,8 @@ def rotate_images(image_array, rotation):
         (h, w) = image.shape[:2]
         center = (w / 2, h / 2)
         M = cv2.getRotationMatrix2D(center, rotation, 1)
-        rotated90 = cv2.warpAffine(image, M, (h, w))
-        rotated_images.append(rotated90)
+        rotated = cv2.warpAffine(image, M, (h, w))
+        rotated_images.append(rotated)
     return np.asarray(rotated_images)
 
 
@@ -129,8 +127,11 @@ if __name__ == "__main__":
     )
     model.fit(x_train, y_train, batch_size=700, validation_split=0.1, epochs=3)
     val_loss, val_acc = model.evaluate(x_test, y_test)
+    print(val_loss, val_acc)
     model.save(MODEL_NAME)
 else:
+    
+    fruit_labels = load_labels()
     MODEL = load_model(BEST_MODEL_NAME)
 
 
