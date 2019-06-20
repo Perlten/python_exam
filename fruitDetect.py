@@ -88,18 +88,12 @@ if __name__ == "__main__":
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
 
-#     # rotate_array1 = rotate_images(x_train, 90)
-#     # print(rotate_array1.shape)
-#     # rotate_array2 = rotate_images(x_train, 180)
-#     # print(rotate_array2.shape)
-#     # rotate_array3 = rotate_images(x_train, 270)
-#     # print(rotate_array3.shape)
+    rotate_array1 = rotate_images(x_train, 90)
+    rotate_array2 = rotate_images(x_train, 180)
+    rotate_array3 = rotate_images(x_train, 270)
     
-    # print(len(y_train.shape))
-    # x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
-    # y_train = np.concatenate((y_train, y_train, y_train, y_train))
-    # print(len(y_train))
-
+    x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
+    y_train = np.concatenate((y_train, y_train, y_train, y_train))
 
     test_filelist = glob.glob(TEST_DATASET)
     test_label_list = [name.split("_")[0].split("/")[-1] for name in test_filelist]
@@ -110,8 +104,6 @@ if __name__ == "__main__":
     x_train = np.array(x_train).reshape(-1, IMAGE_SIZE, IMAGE_SIZE, 1)
     y_train = pd.Series(y_train)
     y_train = pd.get_dummies(y_train.apply(pd.Series).stack()).sum(level=0)
-    print(x_train[1])
-    print(y_train[1])
 
     x_test = np.array(x_test).reshape(-1, IMAGE_SIZE, IMAGE_SIZE, 1)
     y_test = pd.Series(y_test)
@@ -137,12 +129,6 @@ if __name__ == "__main__":
     )
     model.fit(x_train, y_train, batch_size=700, validation_split=0.1, epochs=3)
     val_loss, val_acc = model.evaluate(x_test, y_test)
-
-    predictions = model.predict([x_test])
-    print("pred:",predictions)
-    for x in range(len(test_label_list)):
-        pred_label = np.argmax(predictions[x])
-        print("Thought it was:", fruit_labels[pred_label], "and was", test_label_list[x])
     model.save(MODEL_NAME)
 else:
     MODEL = load_model(BEST_MODEL_NAME)

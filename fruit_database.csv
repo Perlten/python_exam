@@ -26,7 +26,6 @@ certainty_level %,fruit
 55,cola
 59,cola
 58,cola
-<<<<<<< HEAD
 65,banana
 67,banana
 81,banana
@@ -34,7 +33,6 @@ certainty_level %,fruit
 24,banana
 98,avokado
 65,avokado
-=======
 97,avokado
 99,avokado
 95,apple
@@ -114,4 +112,8 @@ certainty_level %,fruit
 33,cola
 65,apple
 97,avokado
->>>>>>> perlt
+33,cola
+95,cola
+98,cola
+98,cola
+97,banana

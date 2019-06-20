@@ -121,7 +121,7 @@ def handle_inputs():
             if 2 < len(prices[selected]):
 
                 if platform.system() == "Linux":
-                    os.system(f'google-chrome {prices[selected][2]} --no-sandbox')
+                    os.system(f'google-chrome {prices[selected][2]} --no-sandbox &')
                 else:
                     webbrowser.open(prices[selected][2])
 
