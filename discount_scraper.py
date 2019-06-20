@@ -29,7 +29,7 @@ def get_prices(type_found, q=None):
     base_url = 'https://www.nemlig.com/'
 
     options = COptions()
-    #options.add_argument("--headless")
+    options.add_argument("--headless")
     options.add_argument("--window-size=1920,1080")
     if platform.system() == "Linux":
         options.add_argument('--no-sandbox')

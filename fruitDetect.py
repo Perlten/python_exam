@@ -12,8 +12,8 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 IMAGE_SIZE = 50
-TRAIN_DATASET = "dataset5/train/*"
-TEST_DATASET = "dataset5/test1/*"
+TRAIN_DATASET = "dataset10/train/*"
+TEST_DATASET = "dataset10/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
 BEST_MODEL_NAME = "fruitDetectModel_84P.h5"
 
