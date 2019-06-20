@@ -17,7 +17,6 @@ TEST_DATASET = "dataset10/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
 BEST_MODEL_NAME = "fruitDetectModel_84P.h5"
 
-
 def proccess_image(image):
     image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
     image = tf.keras.utils.normalize([image], axis=1)[0]
