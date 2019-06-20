@@ -30,10 +30,11 @@ def get_prices(type_found, q=None):
 
     base_url = 'https://www.nemlig.com/'
 
-    # if platform.system() == "Linux":
+    # -if platform.system() == "Linux":t.py", line 88, in handle_inputs
+    #cap.release()
     # options = FOptions()
     # options.add_argument('--headless')
-    # browser = webdriver.Firefox(options=options)
+    #browser = webdriver.Firefox(options=options)
     # else:
     options = COptions()
     options.add_argument("--headless")
