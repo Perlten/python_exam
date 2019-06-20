@@ -11,11 +11,11 @@ import random
 import pandas as pd
 from matplotlib import pyplot as plt
 
-IMAGE_SIZE = 40
+IMAGE_SIZE = 50
 TRAIN_DATASET = "dataset10/train/*"
 TEST_DATASET = "dataset10/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
-BEST_MODEL_NAME = "fruitDetectModel_86P.h5"
+BEST_MODEL_NAME = "fruitDetectModel_86P_2.h5"
 
 
 def proccess_image(image):
@@ -88,21 +88,12 @@ if __name__ == "__main__":
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
 
-<<<<<<< HEAD
     rotate_array1 = rotate_images(x_train, 90)
     print(rotate_array1.shape)
     rotate_array2 = rotate_images(x_train, 180)
     print(rotate_array2.shape)
     rotate_array3 = rotate_images(x_train, 270)
     print(rotate_array3.shape)
-=======
-#     # rotate_array1 = rotate_images(x_train, 90)
-#     # print(rotate_array1.shape)
-#     # rotate_array2 = rotate_images(x_train, 180)
-#     # print(rotate_array2.shape)
-#     # rotate_array3 = rotate_images(x_train, 270)
-#     # print(rotate_array3.shape)
->>>>>>> d9386801200b05d858fecde76519024919ece2d0
     
     print(len(y_train.shape))
     x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
