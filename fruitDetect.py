@@ -15,7 +15,7 @@ IMAGE_SIZE = 50
 TRAIN_DATASET = "dataset10/train/*"
 TEST_DATASET = "dataset10/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
-BEST_MODEL_NAME = "fruitDetectModel_86P_1.h5"
+BEST_MODEL_NAME = "fruitDetectModel_86P_2.h5"
 
 
 def proccess_image(image):
