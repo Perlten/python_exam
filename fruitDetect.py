@@ -11,11 +11,11 @@ import random
 import pandas as pd
 from matplotlib import pyplot as plt
 
-IMAGE_SIZE = 50
+IMAGE_SIZE = 40
 TRAIN_DATASET = "dataset10/train/*"
 TEST_DATASET = "dataset10/test1/*"
 MODEL_NAME = "fruitDetectModel.h5"
-BEST_MODEL_NAME = "fruitDetectModel_84P.h5"
+BEST_MODEL_NAME = "fruitDetectModel_86P.h5"
 
 
 def proccess_image(image):
@@ -93,17 +93,17 @@ if __name__ == "__main__":
     x_train = np.asarray([proccess_image(image) for image in x_train])
     y_train = make_labels(train_label_list)
 
-    # rotate_array1 = rotate_images(x_train, 90)
-    # print(rotate_array1.shape)
-    # rotate_array2 = rotate_images(x_train, 180)
-    # print(rotate_array2.shape)
-    # rotate_array3 = rotate_images(x_train, 270)
-    # print(rotate_array3.shape)
+    rotate_array1 = rotate_images(x_train, 90)
+    print(rotate_array1.shape)
+    rotate_array2 = rotate_images(x_train, 180)
+    print(rotate_array2.shape)
+    rotate_array3 = rotate_images(x_train, 270)
+    print(rotate_array3.shape)
     
-    # print(len(y_train.shape))
-    # x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
-    # y_train = np.concatenate((y_train, y_train, y_train, y_train))
-    # print(len(y_train))
+    print(len(y_train.shape))
+    x_train = np.concatenate((rotate_array1, rotate_array2, rotate_array3, x_train))
+    y_train = np.concatenate((y_train, y_train, y_train, y_train))
+    print(len(y_train))
 
 
     test_filelist = glob.glob(TEST_DATASET)
@@ -123,11 +123,11 @@ if __name__ == "__main__":
     y_test = pd.get_dummies(y_test.apply(pd.Series).stack()).sum(level=0)
 
     model = tf.keras.models.Sequential()
-    model.add(Conv2D(64, (3,3), input_shape=x_train.shape[1:]))
+    model.add(Conv2D(64, (4,4), input_shape=x_train.shape[1:]))
     model.add(Activation("relu"))
     model.add(MaxPooling2D(pool_size=(2,2)))
 
-    model.add(Conv2D(64, (3,3)))
+    model.add(Conv2D(64, (4,4)))
     model.add(Activation("relu"))
     model.add(MaxPooling2D(pool_size=(2,2)))
 
@@ -140,7 +140,7 @@ if __name__ == "__main__":
         loss="binary_crossentropy",
         metrics=["accuracy"]
     )
-    model.fit(x_train, y_train, batch_size=700, validation_split=0.1, epochs=3)
+    model.fit(x_train, y_train, batch_size=100, validation_split=0.1, epochs=7)
     val_loss, val_acc = model.evaluate(x_test, y_test)
 
     predictions = model.predict([x_test])
